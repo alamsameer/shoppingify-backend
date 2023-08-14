@@ -5,33 +5,29 @@ const Schema = mongoose.Schema;
 const shoppingListSchema = new Schema({
     name: {
         type: String,
-        required: true,
-        unique: true,   
+        default:"Shopping List",
     },
-    current: {
+    status: {
         type: Boolean,
-        required: true,
+        default: true,
     },
     items: [
         {
             item: {
                 type: Schema.Types.ObjectId,
                 ref: "Item",
-                required: true,
             },
-            quantity: {
-                type: Number,
-                required: true,
+            status: {
+                type: Boolean,
+                default: false,
             },
             purchaseHistory: [
                 {
                     date: {
                         type: Date,
-                        required: true,
                     },
                     count: {
                         type: Number,
-                        required: true,
                     },
                 },
             ],
