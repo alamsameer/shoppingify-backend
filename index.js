@@ -1,9 +1,8 @@
 import express from 'express';
 import main from './src/config/db.js';
-import categoryRouter from  './src/routes/categoryRoute.js'
-import itemsRouter from './src/routes/itemsRoute.js';
-
-
+import categoryRoutes from  './src/routes/categoryRoute.js'
+import itemsRoutes from './src/routes/itemsRoute.js';
+import shoppingListRoutes from './src/routes/shoppingListRoute.js';
 
 
 const app = express();
@@ -18,9 +17,9 @@ app.use(express.urlencoded({ extended: true }));
 // api routes
 
 
-app.use('/api',categoryRouter)
-app.use('/api', itemsRouter);
-// app.use('/api', shoppingListRoutes);
+app.use('/api',categoryRoutes)
+app.use('/api', itemsRoutes);
+app.use('/api', shoppingListRoutes);
 
 // ... other middleware and server setup ...
 
