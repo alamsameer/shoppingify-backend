@@ -1,9 +1,10 @@
 
 import express from 'express';
-import { getAllItemsCategory,addItems,getItemDetails,getItemsByPage } from "../controllers/itemsController.js";
+import { getAllItemsCategory,addItems,getItemDetails,getItemsByPage,getAllItems } from "../controllers/itemsController.js";
 
 const router = express.Router();
-
+// get all items 
+router.get('/items', getAllItems);
 // Get all items category-wise: GET /api/items/:categoryId
 router.get('/items/:categoryId', getAllItemsCategory);
 

@@ -5,7 +5,7 @@ export const createShoppingList = async (req, res) => {
         const newActiveShoppingList = await ShoppingList.create({
             defaults: {
                 name: "Shopping List",
-                status: true,
+                status: 'active',
                 items: [],
             },
         });
@@ -30,15 +30,15 @@ export const addItemShoppingList = async (req, res) => {
             purchaseHistory: [newPurchaseHistory]
         }
         // check if there is an active shopping list
-        const activeShoppingList = await ShoppingList.find({ status: true });
+        const activeShoppingList = await ShoppingList.find({ status: 'active' });
         if (!activeShoppingList || activeShoppingList.length === 0) {
             res.status(404).json({ error: 'No active shopping list found.' });
         } else {
             // add item to active shopping list
-            const isItem = await ShoppingList.find({ status: true, items: { $elemMatch: { item: id } } });
+            const isItem = await ShoppingList.find({ status: 'active', items: { $elemMatch: { item: id } } });
             //  check if item already exists in the list not exist then push to the items
             if (!isItem || isItem.length === 0) {
-                const updatedShoppingList = await ShoppingList.findOneAndUpdate({ status: true }, { $push: { items: itemtoPush } }, {
+                const updatedShoppingList = await ShoppingList.findOneAndUpdate({ status: 'active' }, { $push: { items: itemtoPush } }, {
                     returnDocument: "after",
                 });
                 res.status(201).json(updatedShoppingList);
@@ -51,7 +51,7 @@ export const addItemShoppingList = async (req, res) => {
                 const historyIndex = isSameDay(currentDate, purchaseHistory)[1];
                 if (!ischeckDate) {
                     // not same day then push to the purchaseHistory
-                    const updatedShoppingList = await ShoppingList.findOneAndUpdate({ status: true },
+                    const updatedShoppingList = await ShoppingList.findOneAndUpdate({ status: 'active' },
                         {
                             $push: {
                                 [`items.${index}.purchaseHistory`]: newPurchaseHistory,
@@ -63,7 +63,7 @@ export const addItemShoppingList = async (req, res) => {
                     res.status(201).json(updatedShoppingList);
                 } else {
                     // same day then increase/decrease in the purchaseHistory
-                    const updatedShoppingList = await ShoppingList.findOneAndUpdate({ status: true },
+                    const updatedShoppingList = await ShoppingList.findOneAndUpdate({ status: 'active' },
                         {
                             $inc: {
                                 [`items.${index}.purchaseHistory.${historyIndex}.count`]: count,
@@ -87,7 +87,7 @@ export const addItemShoppingList = async (req, res) => {
 export const deleteItemShoppingList = async (req, res) => {
     try {
         const { id } = req.body;
-        const activeShoppingList = await ShoppingList.findOne({ status: true });
+        const activeShoppingList = await ShoppingList.findOne({ status: 'active' });
 
         if (!activeShoppingList) {
             return res.status(404).json({ error: 'No active shopping list found.' });
@@ -121,7 +121,7 @@ export const deleteItemShoppingList = async (req, res) => {
 export const updateItemStatus = async (req, res) => {
     try {
         const { id, status } = req.body;
-        const activeShoppingList = await ShoppingList.findOne({ status: true });
+        const activeShoppingList = await ShoppingList.findOne({ status: 'active' });
         if(!activeShoppingList){
             return res.status(404).json({ error: 'No active shopping list found.' });
         }
@@ -129,7 +129,7 @@ export const updateItemStatus = async (req, res) => {
         if(index === -1){
             return res.status(404).json({ error: 'Item not found in the shopping list.' });
         }
-        const updatedShoppingList = await ShoppingList.findOneAndUpdate({ status: true },
+        const updatedShoppingList = await ShoppingList.findOneAndUpdate({ status: 'active' },
             {
                 $set: {
                     [`items.${index}.status`]: status,
@@ -148,13 +148,12 @@ export const updateItemStatus = async (req, res) => {
 export const updateShoppingListStatus = async (req, res) => {
     try {
         const { status } = req.body;
-        const activeShoppingList = await ShoppingList.findOne({ status: true });
-
+        const activeShoppingList = await ShoppingList.findOne({ status: 'active' });
         if (!activeShoppingList) {
             return res.status(404).json({ error: 'No active shopping list found.' });
         }
         else{
-            const updatedShoppingList = await ShoppingList.findOneAndUpdate({ status: true }, { status:status }, {
+            const updatedShoppingList = await ShoppingList.findOneAndUpdate({ status: 'active' }, { status:status }, {
                 returnDocument: "after",
             });
             res.status(201).json(updatedShoppingList);
@@ -168,12 +167,12 @@ export const updateShoppingListStatus = async (req, res) => {
 export const updateShoppingListName = async (req, res) => {
     try {
         const { name } = req.body;
-        const activeShoppingList = await ShoppingList.findOne({status: true });
+        const activeShoppingList = await ShoppingList.findOne({status: 'active' });
         if (!activeShoppingList) {
             return res.status(404).json({ error: 'No active shopping list found.' });
         }
         else{
-            const updatedShoppingList = await ShoppingList.findOneAndUpdate({ status: true }, { name }, {
+            const updatedShoppingList = await ShoppingList.findOneAndUpdate({ status: 'active' }, { name }, {
                 returnDocument: "after",
             });
             res.status(201).json(updatedShoppingList);

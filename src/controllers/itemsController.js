@@ -26,7 +26,47 @@ export const getItemDetails = async (req, res) => {
         res.status(500).json({ error: 'An error occurred while fetching items.' });
     }
 }
-// Get all items category-wise:
+// get all items grouped using category wise 
+export const getAllItems = async (req, res) => {
+    try {
+        const itemsWithCategories = await Item.aggregate([
+            {
+              $lookup: {
+                from: 'categories', // Name of the Category collection
+                localField: 'category',
+                foreignField: '_id',
+                as: 'categoryData'
+              }
+            },
+            {
+              $unwind: '$categoryData'
+            },
+            {
+              $group: {
+                _id: '$category',
+                categoryName: { $first: '$categoryData.name' },
+                items: {
+                  $push: {
+                    _id: '$_id',
+                    name: '$name',
+                    note: '$note',
+                    image: '$image'
+                  }
+                }
+              }
+            }
+          ]);
+          
+          console.log(itemsWithCategories);
+           
+        res.json(itemsWithCategories)
+    } catch (error) {
+        res.status(500).json({ error: 'An error occurred while fetching items.' });
+    }
+}
+
+
+// Get all items category-wise: with :category id  provided 
 export const getAllItemsCategory = async (req, res) => {
     try {
         const id = req.params.categoryId
