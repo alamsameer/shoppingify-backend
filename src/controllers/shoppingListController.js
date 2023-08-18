@@ -181,7 +181,29 @@ export const updateShoppingListName = async (req, res) => {
         res.status(500).json({ error: 'An error occurred while updating shopping list name.' });
     }
 };
+// Get active shopping list and its  items;
+export const getActiveShopingList=async(req,res)=>{
+    try{
+        const activeList=await ShoppingList.find({status:"active"}).populate({
+            path: 'items.item',
+            populate: {
+                path: 'category',
+                model: 'Category',
+                select: 'name',
+            },
+        })
+        .exec();
+         console.log(activeList);
+        if(!activeList || activeList.length===0){
+            return res.status(404).json({ error: 'No active shopping list found.' });
+        }
+        res.status(200).json(activeList);
+    }catch(error){
+        console.log(error.message);
+        res.status(500).json({ error: 'An error occurred while fetching active shopping list.' });
+    }
 
+}
 // Get all shopping lists:
 export const getShoppingLists = async (req, res) => {
     try {

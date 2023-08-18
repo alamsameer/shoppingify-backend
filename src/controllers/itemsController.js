@@ -76,7 +76,7 @@ export const getAllItemsCategory = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'An error occurred while fetching items.' });
     }
-}
+} 
 
 // get all items page wise 
 export async function getItemsByPage(req, res) {
