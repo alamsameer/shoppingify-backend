@@ -1,7 +1,3 @@
-Absolutely, I'll help you craft a comprehensive README for your backend API using the provided information. Please note that you should expand on each section to provide more detailed information as needed.
-
----
-
 # Shoppingify Backend API Documentation
 
 Welcome to the Shoppingify Backend API documentation. This API provides various endpoints for managing shopping lists, items, categories, and statistics. It is built using Node.js, Express.js, and MongoDB.
@@ -16,11 +12,8 @@ Welcome to the Shoppingify Backend API documentation. This API provides various 
   - [Installation](#installation)
   - [Configuration](#configuration)
 - [API Endpoints](#api-endpoints)
-- [Controllers](#controllers)
-- [Models](#models)
-- [Services](#services)
 - [Contributing](#contributing)
-- [License](#license)
+
 
 ## Overview
 
