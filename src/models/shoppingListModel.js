@@ -8,8 +8,9 @@ const shoppingListSchema = new Schema({
         default:"Shopping List",
     },
     status: {
-        type: Boolean,
-        default: true,
+        type: String,
+        enum: ['active', 'cancelled', 'completed'],
+        default: 'active',
     },
     items: [
         {

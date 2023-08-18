@@ -1,6 +1,8 @@
 import express from 'express';
 import {
-    addItemShoppingList, createShoppingList, deleteItemShoppingList, updateShoppingListStatus, updateShoppingListName, updateItemStatus,getShoppingLists
+    addItemShoppingList, createShoppingList, deleteItemShoppingList,
+    updateShoppingListStatus, updateShoppingListName, updateItemStatus,
+    getShoppingLists,getActiveShopingList
 } from '../controllers/shoppingListController.js';
 const router = express.Router();
 // create SHopping List
@@ -16,6 +18,8 @@ router.put('/shopping-list/status', updateShoppingListStatus);
 router.put('/shopping-list/item-status', updateItemStatus);
 // update the name of the list PUT /api/shopping-list/update-name ->
 router.put('/shopping-list/update-name', updateShoppingListName);
+// Get active shopping list: GET /api/shopping-lis/activet ->
+router.get('/shopping-list/active', getActiveShopingList);
 // Get all shopping lists: GET /api/shopping-lists -> 
 router.get('/shopping-lists', getShoppingLists);
 
