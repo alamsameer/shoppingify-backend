@@ -5,22 +5,26 @@ import Category from '../models/categoryModel.js'
 export const addItems = async (req, res) => {
   try {
     const { name, category, note, image } = req.body;
+    console.log({ name, category, note, image });
     const checkCategory = await Category.find({ name: category });
+    console.log(checkCategory);
     if (checkCategory.length == 0) {
-      const category = await Category.create({ name: category });
+      console.log(" inside category");
+      const createCategory = await Category.create({ name: category });
+      const item = await Item.create({ name, category:createCategory._id, note, image });
+      return res.json(item);
     }
-    const item = await Item.create({ name, category, note, image });
+    const item = await Item.create({ name, category:checkCategory[0]._id, note, image });
     return res.json(item);
-    } catch (e) {
-  console.log(e);
-  res.status(500).json({ error: 'An error occurred while addinbg items.' });
-}
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ error: 'An error occurred while adding items.' });
+  }
 
 }
 
 // get individual item details
 export const getItemDetails = async (req, res) => {
-  console.log("inside getItemDetails");
   try {
     const id = req.params.itemId
     console.log("id is : ", id);
@@ -60,10 +64,7 @@ export const getAllItems = async (req, res) => {
           }
         }
       }
-    ]);
-
-    console.log(itemsWithCategories);
-
+    ]).sort({ categoryName: 1 });
     res.json(itemsWithCategories)
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while fetching items.' });
