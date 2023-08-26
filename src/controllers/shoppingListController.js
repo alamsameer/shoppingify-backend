@@ -2,6 +2,7 @@ import ShoppingList from '../models/shoppingListModel.js';
 import { isSameDay } from '../utils/dateUtils.js';
 export const createShoppingList = async (req, res) => {
     try {
+        console.log("get req to create list ");
         const newActiveShoppingList = await ShoppingList.create({
             defaults: {
                 name: "Shopping List",
@@ -9,7 +10,7 @@ export const createShoppingList = async (req, res) => {
                 items: [],
             },
         });
-        res.status(201).json(newActiveShoppingList);
+        res.status(201).json([newActiveShoppingList]);
     } catch (error) {
         // console.error("Error creating shopping list:", error);
         res.status(500).json({ error: 'An error occurred while creating shopping list.' });
@@ -19,6 +20,7 @@ export const createShoppingList = async (req, res) => {
 export const addItemShoppingList = async (req, res) => {
     try {
         const { id, count } = req.body;
+        console.log("got request to add item",id, count);
         const currentDate = new Date();
         const newPurchaseHistory = {
             date: currentDate,
@@ -51,7 +53,7 @@ export const addItemShoppingList = async (req, res) => {
                 const historyIndex = isSameDay(currentDate, purchaseHistory)[1];
                 if (!ischeckDate) {
                     // not same day then push to the purchaseHistory
-                    const updatedShoppingList = await ShoppingList.findOneAndUpdate({ status: 'active' },
+                     const updatedShoppingList = await ShoppingList.findOneAndUpdate({ status: 'active' },
                         {
                             $push: {
                                 [`items.${index}.purchaseHistory`]: newPurchaseHistory,
@@ -122,11 +124,11 @@ export const updateItemStatus = async (req, res) => {
     try {
         const { id, status } = req.body;
         const activeShoppingList = await ShoppingList.findOne({ status: 'active' });
-        if(!activeShoppingList){
+        if (!activeShoppingList) {
             return res.status(404).json({ error: 'No active shopping list found.' });
         }
         const index = activeShoppingList.items.findIndex((item) => item.item == id);
-        if(index === -1){
+        if (index === -1) {
             return res.status(404).json({ error: 'Item not found in the shopping list.' });
         }
         const updatedShoppingList = await ShoppingList.findOneAndUpdate({ status: 'active' },
@@ -152,8 +154,8 @@ export const updateShoppingListStatus = async (req, res) => {
         if (!activeShoppingList) {
             return res.status(404).json({ error: 'No active shopping list found.' });
         }
-        else{
-            const updatedShoppingList = await ShoppingList.findOneAndUpdate({ status: 'active' }, { status:status }, {
+        else {
+            const updatedShoppingList = await ShoppingList.findOneAndUpdate({ status: 'active' }, { status: status }, {
                 returnDocument: "after",
             });
             res.status(201).json(updatedShoppingList);
@@ -167,11 +169,11 @@ export const updateShoppingListStatus = async (req, res) => {
 export const updateShoppingListName = async (req, res) => {
     try {
         const { name } = req.body;
-        const activeShoppingList = await ShoppingList.findOne({status: 'active' });
+        const activeShoppingList = await ShoppingList.findOne({ status: 'active' });
         if (!activeShoppingList) {
             return res.status(404).json({ error: 'No active shopping list found.' });
         }
-        else{
+        else {
             const updatedShoppingList = await ShoppingList.findOneAndUpdate({ status: 'active' }, { name }, {
                 returnDocument: "after",
             });
@@ -182,24 +184,58 @@ export const updateShoppingListName = async (req, res) => {
     }
 };
 // Get active shopping list and its  items;
-export const getActiveShopingList=async(req,res)=>{
-    try{
-        const activeList=await ShoppingList.find({status:"active"}).populate({
-            path: 'items.item',
-            populate: {
-                path: 'category',
-                model: 'Category',
-                select: 'name',
+export const getActiveShopingList = async (req, res) => {
+    // console.log("active");
+    try {
+        const activeList = await ShoppingList.aggregate([
+            {
+                $match: { status: "active" } // Filter the documents to only include 'active' shopping lists
             },
-        })
-        .exec();
-         console.log(activeList);
-        if(!activeList || activeList.length===0){
+            {
+              $unwind: "$items" // Unwind the 'items' array to work with individual items
+            },
+            {
+              $addFields: {
+                "items.total": { $sum: "$items.purchaseHistory.count" } // Calculate the total
+              }
+            },
+            {
+                $lookup:{
+                    from:"items",
+                    localField:"items.item",
+                    foreignField:"_id",
+                    as:"items.item"
+                }
+            },
+            {
+                $unwind:"$items.item"
+            },
+            {
+                $lookup:{
+                    from:"categories",
+                    localField:"items.item.category",
+                    foreignField:"_id",
+                    as:"items.item.category"
+                }
+            },
+            {
+              $group: {
+                _id: "$_id", // Group the items back to the original document
+                name: { $first: "$name" },
+                status: { $first: "$status" },
+                items: { $push: "$items" } // Push the modified items back
+              }
+            }
+          ]);
+
+          
+        if (!activeList || activeList.length === 0) {
             return res.status(404).json({ error: 'No active shopping list found.' });
         }
+    
         res.status(200).json(activeList);
-    }catch(error){
-        console.log(error.message);
+    } catch (error) {
+        // console.log(error.message);
         res.status(500).json({ error: 'An error occurred while fetching active shopping list.' });
     }
 
@@ -207,8 +243,27 @@ export const getActiveShopingList=async(req,res)=>{
 // Get all shopping lists:
 export const getShoppingLists = async (req, res) => {
     try {
-        const shoppingLists = await ShoppingList.find();
-        res.status(200).json(shoppingLists);
+        const shoppingLists = await ShoppingList.aggregate([
+            {
+              $unwind: "$items" // Unwind the 'items' array to work with individual items
+            },
+            {
+              $addFields: {
+                "items.total": { $sum: "$items.purchaseHistory.count" } // Calculate the total
+              }
+            },
+            {
+              $group: {
+                _id: "$_id", // Group the items back to the original document
+                name: { $first: "$name" },
+                status: { $first: "$status" },
+                items: { $push: "$items" } // Push the modified items back
+              }
+            }
+          ]);
+          
+        //   console.log(shoppingLists);
+          res.status(200).json(shoppingLists);
     } catch (error) {
         res.status(404).json({ error: error.message });
     }

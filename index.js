@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import main from './src/config/db.js';
 import categoryRoutes from  './src/routes/categoryRoute.js'
 import itemsRoutes from './src/routes/itemsRoute.js';
@@ -10,6 +11,7 @@ main().then(()=>{console.log("connected to mongodb ");}).catch(console.dir);
 
 
 // parse requests of content-type - application/json
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
