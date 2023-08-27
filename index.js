@@ -1,10 +1,10 @@
 import express from 'express';
 import cors from 'cors';
-import main from '../src/config/db.js';
-import categoryRoutes from  '../src/routes/categoryRoute.js'
-import itemsRoutes from '../src/routes/itemsRoute.js';
-import shoppingListRoutes from '../src/routes/shoppingListRoute.js';
-import statisticsRoutes from '../src/routes/statisticRoute.js';
+import main from './src/config/db.js';
+import categoryRoutes from  './src/routes/categoryRoute.js'
+import itemsRoutes from './src/routes/itemsRoute.js';
+import shoppingListRoutes from './src/routes/shoppingListRoute.js';
+import statisticsRoutes from './src/routes/statisticRoute.js';
 const app= express();
 // connect to mongodb
 main().then(()=>{console.log("connected to mongodb ");}).catch(console.dir);
