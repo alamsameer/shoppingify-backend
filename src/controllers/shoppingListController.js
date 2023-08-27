@@ -20,7 +20,7 @@ export const createShoppingList = async (req, res) => {
 export const addItemShoppingList = async (req, res) => {
     try {
         const { id, count } = req.body;
-        console.log("got request to add item",id, count);
+        console.log("got request to add item", id, count);
         const currentDate = new Date();
         const newPurchaseHistory = {
             date: currentDate,
@@ -53,7 +53,7 @@ export const addItemShoppingList = async (req, res) => {
                 const historyIndex = isSameDay(currentDate, purchaseHistory)[1];
                 if (!ischeckDate) {
                     // not same day then push to the purchaseHistory
-                     const updatedShoppingList = await ShoppingList.findOneAndUpdate({ status: 'active' },
+                    const updatedShoppingList = await ShoppingList.findOneAndUpdate({ status: 'active' },
                         {
                             $push: {
                                 [`items.${index}.purchaseHistory`]: newPurchaseHistory,
@@ -192,47 +192,47 @@ export const getActiveShopingList = async (req, res) => {
                 $match: { status: "active" } // Filter the documents to only include 'active' shopping lists
             },
             {
-              $unwind: "$items" // Unwind the 'items' array to work with individual items
+                $unwind: "$items" // Unwind the 'items' array to work with individual items
             },
             {
-              $addFields: {
-                "items.total": { $sum: "$items.purchaseHistory.count" } // Calculate the total
-              }
-            },
-            {
-                $lookup:{
-                    from:"items",
-                    localField:"items.item",
-                    foreignField:"_id",
-                    as:"items.item"
+                $addFields: {
+                    "items.total": { $sum: "$items.purchaseHistory.count" } // Calculate the total
                 }
             },
             {
-                $unwind:"$items.item"
-            },
-            {
-                $lookup:{
-                    from:"categories",
-                    localField:"items.item.category",
-                    foreignField:"_id",
-                    as:"items.item.category"
+                $lookup: {
+                    from: "items",
+                    localField: "items.item",
+                    foreignField: "_id",
+                    as: "items.item"
                 }
             },
             {
-              $group: {
-                _id: "$_id", // Group the items back to the original document
-                name: { $first: "$name" },
-                status: { $first: "$status" },
-                items: { $push: "$items" } // Push the modified items back
-              }
+                $unwind: "$items.item"
+            },
+            {
+                $lookup: {
+                    from: "categories",
+                    localField: "items.item.category",
+                    foreignField: "_id",
+                    as: "items.item.category"
+                }
+            },
+            {
+                $group: {
+                    _id: "$_id", // Group the items back to the original document
+                    name: { $first: "$name" },
+                    status: { $first: "$status" },
+                    items: { $push: "$items" } // Push the modified items back
+                }
             }
-          ]);
+        ]);
 
-          
+
         if (!activeList || activeList.length === 0) {
             return res.status(404).json({ error: 'No active shopping list found.' });
         }
-    
+
         res.status(200).json(activeList);
     } catch (error) {
         // console.log(error.message);
@@ -245,25 +245,80 @@ export const getShoppingLists = async (req, res) => {
     try {
         const shoppingLists = await ShoppingList.aggregate([
             {
-              $unwind: "$items" // Unwind the 'items' array to work with individual items
+                $unwind: "$items" // Unwind the 'items' array to work with individual items
             },
             {
-              $addFields: {
-                "items.total": { $sum: "$items.purchaseHistory.count" } // Calculate the total
-              }
+                $addFields: {
+                    "items.total": { $sum: "$items.purchaseHistory.count" } // Calculate the total
+                }
             },
             {
-              $group: {
-                _id: "$_id", // Group the items back to the original document
-                name: { $first: "$name" },
-                status: { $first: "$status" },
-                items: { $push: "$items" } // Push the modified items back
-              }
+                $lookup: {
+                    from: "items",
+                    localField: "items.item",
+                    foreignField: "_id",
+                    as: "items.item"
+                }
+            },
+            {
+                $unwind: "$items.item"
+            },
+            {
+                $lookup: {
+                    from: "categories",
+                    localField: "items.item.category",
+                    foreignField: "_id",
+                    as: "items.item.category"
+                }
+            },
+            // {
+            //   $group: {
+            //     _id: "$_id", // Group the items back to the original document
+            //     name: { $first: "$name" },
+            //     status: { $first: "$status" },
+            //     items: { $push: "$items" } // Push the modified items back
+            //   }
+            // }
+            {
+                $group: {
+                  _id: {
+                    shoppingListId: "$_id",
+                    shoppingListName: "$name",
+                    categoryName: "$items.item.category.name"
+                  },
+                  shoppingListId: { $first: "$_id" },
+                  shoppingListName: { $first: "$name" },
+                  status:{$first:"$status"},
+                  categoryName: { $first: "$items.item.category.name" },
+                  items: {
+                    $push: {
+                      itemId: "$items.item._id",
+                      itemName: "$items.item.name",
+                      total: "$items.total"
+                    }
+                  }
+                }
+              },
+            {
+
+                $group: {
+                    _id: "$shoppingListId",
+                    shoppingListId: { $first: "$shoppingListId" },
+                    name: { $first: "$shoppingListName" },
+                    status:{$first:"$status"},
+                    categories: {
+                        $push: {
+                            categoryName: "$categoryName",
+                            items: "$items"
+                        }
+                    }
+                }
+
             }
-          ]);
-          
+        ]);
+
         //   console.log(shoppingLists);
-          res.status(200).json(shoppingLists);
+        res.status(200).json(shoppingLists);
     } catch (error) {
         res.status(404).json({ error: error.message });
     }
