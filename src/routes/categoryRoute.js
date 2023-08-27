@@ -5,7 +5,7 @@ const router=Router();
 // Add category 
 router.post('/add-category',addCategory)
 // Get all  category: GET /api/category
-router.get('/category',getAllCategories)
+router.get('/categories',getAllCategories)
 // Get all items category-wise: GET /api/items/:categoryId
 
 
