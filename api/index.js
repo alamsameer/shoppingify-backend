@@ -15,9 +15,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// api routes
-
-
+app.get('/', (req, res) => {
+    res.json({ message: "Welcome to the application." });
+});
+// api route
 app.use('/api',categoryRoutes)
 app.use('/api', itemsRoutes);
 app.use('/api', shoppingListRoutes);
