@@ -44,11 +44,22 @@ export const getTopItems = async (req, res) => {
             },
 
             { $sort: { totalQuantity: -1 } },
-            { $limit: 5 }
+            { $limit: 5 },
+            {
+                $project: {
+                    _id: 1,
+                    totalQuantity: 1,
+                    percentage: {
+                        $multiply: [
+                            { $divide: ['$totalQuantity', { $sum: '$totalQuantity'}] },100 // Multiply by 100 to get the percentage
+                        ]
+                    }
+                }
+            }
         ]);
-        
-        
-        
+
+
+
         res.status(200).json(topItems);
     } catch (error) {
         res.status(404).json({ message: error.message });
@@ -96,13 +107,24 @@ export const getTopCategories = async (req, res) => {
                 }
             },
             {
-                $group:{
+                $group: {
                     _id: '$categoryName',
                     totalQuantity: { $sum: '$totalQuantity' }
                 }
             },
             { $sort: { totalQuantity: -1 } },
-            { $limit: 5 }
+            { $limit: 5 },
+            {
+                $project: {
+                    _id: 1,
+                    totalQuantity: 1,
+                    percentage: {
+                        $multiply: [
+                            { $divide: ['$totalQuantity', { $sum: '$totalQuantity'}] },100 // Multiply by 100 to get the percentage
+                        ]
+                    }
+                }
+            }
         ]);
 
         res.status(200).json(topCategories);
