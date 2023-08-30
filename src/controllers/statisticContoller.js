@@ -44,18 +44,7 @@ export const getTopItems = async (req, res) => {
             },
 
             { $sort: { totalQuantity: -1 } },
-            { $limit: 5 },
-            {
-                $project: {
-                    _id: 1,
-                    totalQuantity: 1,
-                    percentage: {
-                        $multiply: [
-                            { $divide: ['$totalQuantity', { $sum: '$totalQuantity'}] },100 // Multiply by 100 to get the percentage
-                        ]
-                    }
-                }
-            }
+            { $limit: 4 },
         ]);
 
 
@@ -113,18 +102,7 @@ export const getTopCategories = async (req, res) => {
                 }
             },
             { $sort: { totalQuantity: -1 } },
-            { $limit: 5 },
-            {
-                $project: {
-                    _id: 1,
-                    totalQuantity: 1,
-                    percentage: {
-                        $multiply: [
-                            { $divide: ['$totalQuantity', { $sum: '$totalQuantity'}] },100 // Multiply by 100 to get the percentage
-                        ]
-                    }
-                }
-            }
+            { $limit: 4 },     
         ]);
 
         res.status(200).json(topCategories);
