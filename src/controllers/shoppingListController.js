@@ -2,15 +2,19 @@ import ShoppingList from '../models/shoppingListModel.js';
 import { isSameDay } from '../utils/dateUtils.js';
 export const createShoppingList = async (req, res) => {
     try {
-        console.log("get req to create list ");
-        const newActiveShoppingList = await ShoppingList.create({
-            defaults: {
-                name: "Shopping List",
-                status: 'active',
-                items: [],
-            },
-        });
-        res.status(201).json([newActiveShoppingList]);
+        const {email,id}=req.userDetail
+        const isActiveShoppingList = await ShoppingList.find({ status: 'active',user:id });
+        if (isActiveShoppingList && isActiveShoppingList.length > 0) {
+            return res.status(409).json({ error: 'Active shopping list already exists.' });
+        }
+        const defaultShoppingList={
+            user:id,
+            name: "Shopping List",
+            status: 'active',
+            items: [],
+        }
+        const newActiveShoppingList = await ShoppingList.create(defaultShoppingList);
+         res.status(201).json([newActiveShoppingList]);
     } catch (error) {
         // console.error("Error creating shopping list:", error);
         res.status(500).json({ error: 'An error occurred while creating shopping list.' });

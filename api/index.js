@@ -1,10 +1,12 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import main from '../src/config/db.js';
 import categoryRoutes from  '../src/routes/categoryRoute.js'
 import itemsRoutes from '../src/routes/itemsRoute.js';
 import shoppingListRoutes from '../src/routes/shoppingListRoute.js';
 import statisticsRoutes from '../src/routes/statisticRoute.js';
+import auth from "../src/routes/auth.js"
 const app= express();
 // connect to mongodb
 main().then(()=>{console.log("connected to mongodb ");}).catch(console.dir);
@@ -14,13 +16,15 @@ main().then(()=>{console.log("connected to mongodb ");}).catch(console.dir);
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+// Use cookie-parser middleware
+app.use(cookieParser());
 app.get('/', (req, res) => {
     res.json({ message: "Welcome to the application." });
 });
 
   
 // api route
+app.use('/api',auth)
 app.use('/api',categoryRoutes)
 app.use('/api', itemsRoutes);
 app.use('/api', shoppingListRoutes);
