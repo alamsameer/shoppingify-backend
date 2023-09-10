@@ -25,10 +25,9 @@ export const signUp=async (req, res) => {
   
       // Add the user to the database
       const newUserData = await User.create(newUser);
-      const id=newUserData._id
-      console.log(id);
+      const userid=newUserData._id
       // Generate a JWT token
-      const token = jwt.sign({ email,id}, process.env.JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ email,userid}, process.env.JWT_SECRET, { expiresIn: '1h' });
       //return cookie
       res.cookie('token', token, {
         secure: true,
@@ -62,10 +61,9 @@ export const signIn=async (req, res) => {
     if (!isPasswordMatch) {
       return res.status(401).json({ error: 'Incorrect password' });
     }
-    const id=user._id
-    console.log("sign id user",id);
+    const userid=user._id
     // Generate a JWT token
-    const token = jwt.sign({ email,id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ email,userid}, process.env.JWT_SECRET, { expiresIn: '1h' }); 
     res.cookie('token', token, {
       secure: true,
       httpOnly: true,
@@ -75,11 +73,21 @@ export const signIn=async (req, res) => {
     res.json({ message: 'User logged in successfully',token  });
   } catch (error) {
     console.log(error);
-    res.cookie('token', token, {
+    res.cookie('token',"", {
       secure: true,
       httpOnly: true,
       sameSite: 'none'
     });
     res.status(500).json({ error: 'Error logging in user' });
   }
+}
+
+export const signOut=(req,res)=>{
+
+  res.cookie('token',"", {
+    secure: true,
+    httpOnly: true,
+    sameSite: 'none'
+  });
+  res.status(200).json({message:"you are succesfully signed out "})
 }
