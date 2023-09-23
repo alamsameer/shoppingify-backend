@@ -1,4 +1,3 @@
-import express from 'express';
 import { Router } from 'express';
 import { addCategory, getAllCategories} from '../controllers/categoryController.js';
 const router=Router();
