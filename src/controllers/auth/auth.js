@@ -70,7 +70,7 @@ export const signIn=async (req, res) => {
       sameSite: 'none'
     });
     // Return the token to the client
-    res.json({ message: 'User logged in successfully',token  });
+    res.json({ message: 'User logged in successfully',token ,user });
   } catch (error) {
     console.log(error);
     res.cookie('token',"", {

@@ -8,7 +8,6 @@ export const checkAuth=(req,res,next)=>{
         req.userDetail={email,userid}
         next()
     }catch(e){
-        console.log(e)
         res.cookie('token',"", {
             secure: true,
             httpOnly: true,

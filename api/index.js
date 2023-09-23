@@ -13,7 +13,11 @@ main().then(()=>{console.log("connected to mongodb ");}).catch(console.dir);
 
 
 // parse requests of content-type - application/json
-app.use(cors());
+app.use(cors({
+    origin: 'http://127.0.0.1:5173', // Change this to your frontend's URL
+    credentials: true, // Allow cookies to be sent
+    optionSuccessStatus:200
+  }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // Use cookie-parser middleware
