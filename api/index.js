@@ -14,7 +14,7 @@ main().then(()=>{console.log("connected to mongodb ");}).catch(console.dir);
 
 // parse requests of content-type - application/json
 app.use(cors({
-    origin: 'https://shoppingify-frontend-one.vercel.app/', // Change this to your frontend's URL
+    origin: 'https://shoppingify-frontend-one.vercel.app', // Change this to your frontend's URL
     credentials: true, // Allow cookies to be sent
     optionSuccessStatus:200
   }));
