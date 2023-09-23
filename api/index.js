@@ -12,12 +12,17 @@ const app= express();
 main().then(()=>{console.log("connected to mongodb ");}).catch(console.dir);
 
 
-// parse requests of content-type - application/json
+
+// Allow requests from all origins and include credentials
 app.use(cors({
-    origin: 'https://shoppingify-frontend-one.vercel.app', // Change this to your frontend's URL
-    credentials: true, // Allow cookies to be sent
-    optionSuccessStatus:200
-  }));
+  origin: function (origin, callback) {
+    // Allow all origins
+    callback(null, true);
+  },
+  credentials: true,
+  optionSuccessStatus: 200
+}));
+// parse requests of content-type - application/json
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // Use cookie-parser middleware
