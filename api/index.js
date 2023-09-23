@@ -14,14 +14,7 @@ main().then(()=>{console.log("connected to mongodb ");}).catch(console.dir);
 
 
 // Allow requests from all origins and include credentials
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow all origins
-    callback(null, true);
-  },
-  credentials: true,
-  optionSuccessStatus: 200
-}));
+app.use(cors());
 // parse requests of content-type - application/json
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

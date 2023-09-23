@@ -64,20 +64,10 @@ export const signIn=async (req, res) => {
     const userid=user._id
     // Generate a JWT token
     const token = jwt.sign({ email,userid}, process.env.JWT_SECRET, { expiresIn: '1h' }); 
-    res.cookie('token', token, {
-      secure: true,
-      httpOnly: true,
-      sameSite: 'none'
-    });
     // Return the token to the client
     res.json({ message: 'User logged in successfully',token ,user });
   } catch (error) {
-    console.log(error);
-    res.cookie('token',"", {
-      secure: true,
-      httpOnly: true,
-      sameSite: 'none'
-    });
+    console.log(error.message);
     res.status(500).json({ error: 'Error logging in user' });
   }
 }
